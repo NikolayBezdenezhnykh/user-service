@@ -3,12 +3,12 @@ entries:
   user-service:
   - apiVersion: v1
     appVersion: "0.1"
-    created: "2023-04-17T23:58:12.2540531+03:00"
+    created: "2023-04-18T00:06:56.9885104+03:00"
     description: A Helm chart of user-service for Kubernetes
     digest: da8e997d2531ffe21e5d7814a2e766b1672c8845c3bba65d736b18396c9f7d60
     name: user-service
     type: application
     urls:
-    - https://NikolayBezdenezhnykh.github.io/user-service/charts/user-service-0.1.0.tgz
+    - https://NikolayBezdenezhnykh.github.io/user-service/user-service-0.1.0.tgz
     version: 0.1.0
-generated: "2023-04-17T23:58:12.2528484+03:00"
+generated: "2023-04-18T00:06:56.986227+03:00"
