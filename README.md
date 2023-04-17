@@ -8,4 +8,4 @@ helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo update && 
 
 
 # Установка user-service:
-helm repo add user-service https://github.com/NikolayBezdenezhnykh/user-service && helm install us-app user-service/charts
+helm repo add user-service-repo https://NikolayBezdenezhnykh.github.io/user-service/charts && helm install us-app user-service-repo/user-service
