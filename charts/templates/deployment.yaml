@@ -1,0 +1,58 @@
+{{- $image := .Values.image | default dict -}}
+{{- $livenessProbe := .Values.livenessProbe | default dict -}}
+{{- $readinessProbe := .Values.readinessProbe | default dict -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "user-service.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector: 
+    matchLabels: 
+      app: {{ include "user-service.name" . }}
+  strategy: 
+  {{ toYaml .Values.updateStrategy | indent 4 }}
+  template:
+    metadata: 
+      labels: 
+        app: {{ include "user-service.name" . }}
+    spec:
+      initContainers:
+      - name: {{ .Chart.Name }}-init
+        image: "{{ $image.repository }}:{{ $image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ $image.pullPolicy }}
+        command: ["dotnet"]
+        args: ["Api.dll", "update"]
+        envFrom:
+          - secretRef:
+              name: {{ include "user-service.secretName" . }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ $image.repository }}:{{ $image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ $image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.containerPort }}
+        envFrom:
+          - configMapRef:
+              name: {{ include "user-service.configmap" . }}
+          - secretRef:
+              name: {{ include "user-service.secretName" . }}
+        {{- if $livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: {{ $livenessProbe.path }}
+            port: {{ .Values.containerPort }}
+          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ $livenessProbe.periodSeconds }}
+          failureThreshold: {{ $livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if $readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: {{ $readinessProbe.path }}
+            port: {{ .Values.containerPort }}
+          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ $readinessProbe.periodSeconds }}
+        {{- end }}

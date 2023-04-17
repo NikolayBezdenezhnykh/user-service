@@ -1,0 +1,9 @@
+{{- if (include "user-service.createConfigMap" .) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name:  {{ include "user-service.fullname" . }}
+data:
+    Logging__LogLevel__Default: "Information"
+    Logging__LogLevel__Microsoft.AspNetCore: "Warning"
+ {{- end }}

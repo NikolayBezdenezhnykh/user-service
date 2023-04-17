@@ -1,0 +1,13 @@
+{{- $service := .Values.service | default dict -}}
+apiVersion: v1
+kind: Service
+metadata: 
+  name: {{ include "user-service.fullname" . }}
+spec:
+  selector: 
+    app: {{ include "user-service.name" . }}
+  ports:
+    - protocol: {{ $service.protocol }}
+      port: {{ $service.port }}
+      targetPort: {{ .Values.containerPort }}
+  type: {{ $service.type }}
