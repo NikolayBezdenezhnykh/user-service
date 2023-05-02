@@ -1,5 +1,6 @@
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
 
 namespace Api;
 
@@ -28,9 +29,10 @@ public class Program
         app.UseSwagger();
         app.UseSwaggerUI();
 
+        app.UseHttpMetrics();
         app.UseAuthorization();
 
-
+        app.MapMetrics();
         app.MapControllers();
 
         app.Run();
