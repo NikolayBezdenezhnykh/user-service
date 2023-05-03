@@ -17,3 +17,6 @@ Latency, RPS, 500 Error по ngnix_ingress_controller. Настроены але
 
 ## 6_database_stat
 Метрики по БД. Добавил графики из готовых дашбордов: https://grafana.com/grafana/dashboards/9628-postgresql-database/ и https://grafana.com/grafana/dashboards/455-postgres-overview/
+
+## dashboard.json
+Шаблон дашборда.
