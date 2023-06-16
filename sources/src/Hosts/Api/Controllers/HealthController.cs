@@ -4,6 +4,7 @@ namespace DockerBasics.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ApiVersionNeutral]
     public class HealthController : ControllerBase
     {
         [HttpGet]

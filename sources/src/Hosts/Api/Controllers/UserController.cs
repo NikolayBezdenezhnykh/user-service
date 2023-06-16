@@ -1,13 +1,17 @@
+using Api.Attributes;
 using Api.ViewModels;
 using Domain;
 using Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers
 {
+    [Route("api/v{version:apiVersion}/user")]
     [ApiController]
-    [Route("user")]
+    [ApiVersion("1.0")]
+    [AllowCurrentUserAuthorization(RouteField = "login")]
     public class UserController : ControllerBase
     {
         private readonly UserDbContext _dbContext;
@@ -19,7 +23,8 @@ namespace Api.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create(CreateUserVm userVm)
+        [AllowAnonymous]
+        public async Task<IActionResult> Create(CreateUserVm userVm, ApiVersion version)
         {
             var user = new User()
             {
@@ -35,17 +40,18 @@ namespace Api.Controllers
 
             return CreatedAtAction("Get", new
             {
-                userId = user.Id,
+                login = user.Login,
+                version = version.ToString()
             }, null);
 
         }
 
-        [HttpGet("{userId:long}")]
+        [HttpGet("{login}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Get(long userId)
+        public async Task<IActionResult> Get(string login)
         {
-            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Login == login);
             if (user == null) NotFound();
 
             var userVm = new UserVm()
@@ -61,12 +67,12 @@ namespace Api.Controllers
             return Ok(user);
         }
 
-        [HttpPut("{userId:long}")]
+        [HttpPut("{login}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(long userId, [FromBody] UpdateUserVm userVm)
+        public async Task<IActionResult> Update(string login, [FromBody] UpdateUserVm userVm)
         {
-            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Login == login);
             if (user == null) NotFound();
 
             user.LastName = userVm.LastName;
@@ -79,12 +85,12 @@ namespace Api.Controllers
             return Ok();
         }
 
-        [HttpDelete("{userId:long}")]
+        [HttpDelete("{login}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(long userId)
+        public async Task<IActionResult> Delete(string login)
         {
-            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Login == login);
             if (user == null) NotFound();
 
             _dbContext.Users.Remove(user);
