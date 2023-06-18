@@ -12,6 +12,13 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddUserPostgreStorage(builder.Configuration);
+        if (args.Length > 0 && args[0] == "update")
+        {
+            await UpdateDb(builder.Build());
+            return;
+        }
+
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddApiVersioning();
@@ -42,18 +49,22 @@ public class Program
                     }
                 });
         });
-        builder.Services.AddUserPostgreStorage(builder.Configuration);
         builder.Services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                // адрес сервера SecurityService
+                // адрес сервера auth-service
                 options.Authority = builder.Configuration.GetSection("IdentityServerClient:Authority").Value;
 
                 options.Audience = builder.Configuration.GetSection("IdentityServerClient:Audience").Value;
 
-                // пока сервер не поддерживает https
+                // сервер не поддерживает https
                 options.RequireHttpsMetadata = false;
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.TokenValidationParameters.ValidateIssuer = false;
+                }
 
                 options.TokenValidationParameters.ClockSkew = TimeSpan.FromSeconds(30);
             });
