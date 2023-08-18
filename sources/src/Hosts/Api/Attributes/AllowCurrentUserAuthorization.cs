@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
+using System.Security.Claims;
 
 namespace Api.Attributes
 {
@@ -21,7 +22,6 @@ namespace Api.Attributes
             }
 
             if (context.HttpContext.User?.Identity == null
-                || string.IsNullOrEmpty(context.HttpContext.User.Identity.Name)
                 || !context.HttpContext.User.Identity.IsAuthenticated)
             {
                 context.Result = new UnauthorizedResult();
@@ -29,7 +29,7 @@ namespace Api.Attributes
             }
 
             if (!context.HttpContext.Request.RouteValues.TryGetValue(RouteField, out var value)
-                 || context.HttpContext.User.Identity.Name != value?.ToString())
+                 || !context.HttpContext.User.HasClaim(c => c.Type == ClaimTypes.NameIdentifier && c.Value == value?.ToString()))
             {
                 context.Result = new ForbidResult();
                 return;

@@ -1,9 +1,9 @@
+using Application.Implementations;
 using Infrastructure;
+using Infrastructure.KafkaConsumerHandlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Prometheus;
-
 namespace Api;
 
 public class Program
@@ -23,6 +23,10 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddApiVersioning();
         builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddScoped<KafkaMessageCreateUserHandler>();
+        builder.Services.AddSingleton<IKafkaMessageHandlerFactory, KafkaMessageHandlerFactory>();
+        builder.Services.AddHostedService<KafkaConsumerHandler>();
+        builder.Services.Configure<KafkaConsumerConfig>(options => builder.Configuration.GetSection("KafkaConsumer").Bind(options));
         builder.Services.AddSwaggerGen(opt =>
         {
             opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -69,12 +73,7 @@ public class Program
                 options.TokenValidationParameters.ClockSkew = TimeSpan.FromSeconds(30);
             });
 
-        var app = builder.Build();
-        if (args.Length > 0 && args[0] == "update")
-        {
-            await UpdateDb(app);
-            return;
-        }
+        var app = builder.Build();       
 
         // Configure the HTTP request pipeline.
         app.UseSwagger();

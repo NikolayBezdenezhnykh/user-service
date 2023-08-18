@@ -10,7 +10,7 @@ public sealed class User
 {
     public long Id { get; set; }
 
-    public string Login { get; set; }
+    public string Name { get; set; }
 
     public string FirstName { get; set; }
 
@@ -19,4 +19,6 @@ public sealed class User
     public string Email { get; set; }
 
     public string Phone { get; set; }
+
+    public Guid UserId { get; set; }
 }

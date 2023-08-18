@@ -8,9 +8,7 @@ namespace Api.ViewModels;
 
 public class UserVm
 {
-    public long Id { get; set; }
-
-    public string Login { get; set; }
+    public string UserId { get; set; }
 
     public string FirstName { get; set; }
 
