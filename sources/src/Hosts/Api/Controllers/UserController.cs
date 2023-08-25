@@ -1,6 +1,7 @@
 using Api.Attributes;
 using Api.ViewModels;
 using Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ namespace Api.Controllers
     [Route("api/v{version:apiVersion}/user")]
     [ApiController]
     [ApiVersion("1.0")]
-    [AllowCurrentUserAuthorization(RouteField = "userId")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly UserDbContext _dbContext;
